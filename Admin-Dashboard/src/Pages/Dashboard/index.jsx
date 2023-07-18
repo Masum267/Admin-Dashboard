@@ -6,7 +6,7 @@ import { getOrders } from '../../API/Index'
 
 function Dashboard() {
     return (
-        <div>
+        <Space size={20} direction='vertical'>
             <Typography.Title level={4}>
                 This is Dashboard.
             </Typography.Title>
@@ -54,15 +54,17 @@ function Dashboard() {
             <Space>
                 <RecentOrders />
             </Space>
-        </div>
+        </Space>
     )
 }
 
 const DashboardCard = ({ title, value, icon }) => {
     return (
-        <Card direction='horizontal'>
-            {icon}
-            <Statistic title={title} value={value} />
+        <Card>
+            <Space direction='horizontal'>
+                {icon}
+                <Statistic title={title} value={value} />
+            </Space>
         </Card>
     )
 }
@@ -74,12 +76,14 @@ const RecentOrders = () => {
     useEffect(() => {
         setLoading(true)
         getOrders().then(res => {
-            setDataSource(res.products);
+            setDataSource(res.products.splice(0, 3));
             setLoading(false);
         })
     }, [])
 
     return (
+        <>
+        <Typography.Text>Recent Orders</Typography.Text>
         <Table
             columns={[
                 {
@@ -92,14 +96,16 @@ const RecentOrders = () => {
                 },
                 {
                     title: "Price",
-                    dataIndex: 'discountPrice'
+                    dataIndex: 'discountedPrice'
                 },
             ]}
             loading={loading}
             dataSource={dataSource}
+            pagination={false}
         >
 
         </Table>
+        </>
     )
 }
 
