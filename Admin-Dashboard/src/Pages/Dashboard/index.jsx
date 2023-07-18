@@ -2,13 +2,35 @@ import React, { useEffect, useState } from 'react'
 import Typography from 'antd/es/typography/Typography'
 import { Card, Space, Statistic, Table } from 'antd'
 import { DollarCircleOutlined, ShoppingCartOutlined, ShoppingOutlined, UserOutlined } from '@ant-design/icons'
-import { getOrders } from '../../API/Index'
+import { getOrders, getRevenue } from '../../API/Index';
+import {
+    Chart as ChartJS,
+    CategoryScale,
+    LinearScale,
+    BarElement,
+    Title,
+    Tooltip,
+    Legend,
+} from 'chart.js';
+import { Bar } from 'react-chartjs-2';
+
+ChartJS.register(
+    CategoryScale,
+    LinearScale,
+    BarElement,
+    Title,
+    Tooltip,
+    Legend
+);
+
+
+
 
 function Dashboard() {
     return (
         <Space size={20} direction='vertical'>
             <Typography.Title level={4}>
-                This is Dashboard.
+                Dashboard
             </Typography.Title>
             <Space direction="horizontal">
                 <DashboardCard icon={<ShoppingOutlined
@@ -53,6 +75,7 @@ function Dashboard() {
             </Space>
             <Space>
                 <RecentOrders />
+                <DashboardChart />
             </Space>
         </Space>
     )
@@ -79,34 +102,88 @@ const RecentOrders = () => {
             setDataSource(res.products.splice(0, 3));
             setLoading(false);
         })
-    }, [])
+    }, []);
 
     return (
         <>
-        <Typography.Text>Recent Orders</Typography.Text>
-        <Table
-            columns={[
-                {
-                    title: "Title",
-                    dataIndex: 'title'
-                },
-                {
-                    title: "Quantity",
-                    dataIndex: 'quantity'
-                },
-                {
-                    title: "Price",
-                    dataIndex: 'discountedPrice'
-                },
-            ]}
-            loading={loading}
-            dataSource={dataSource}
-            pagination={false}
-        >
+            <Typography.Text>Recent Orders</Typography.Text>
+            <Table
+                columns={[
+                    {
+                        title: "Title",
+                        dataIndex: 'title'
+                    },
+                    {
+                        title: "Quantity",
+                        dataIndex: 'quantity'
+                    },
+                    {
+                        title: "Price",
+                        dataIndex: 'discountedPrice'
+                    },
+                ]}
+                loading={loading}
+                dataSource={dataSource}
+                pagination={false}
+            >
 
-        </Table>
+            </Table>
         </>
+    )
+};
+
+const DashboardChart = () => {
+
+    const [revenueData, setRevenueData] = useState({
+        labels:[],
+        datasets:[]
+    })
+
+    useEffect(() => {
+        getRevenue().then(res => {
+            const labels = res.carts.map(cart => {
+                return `User-${cart.userId}`
+            });
+            const data = res.carts.map(cart => {
+                return cart.discountedTotal
+            });
+
+            const dataSource = {
+                labels,
+                datasets: [
+                    {
+                        label: 'Revenue',
+                        data: data,
+                        backgroundColor: 'rgba(0, 255, 0, 0.8)',
+                    }
+                ],
+            }
+
+            setRevenueData(dataSource)
+
+        })
+    }, [])
+
+    const options = {
+        responsive: true,
+        plugins: {
+            legend: {
+                position: 'bottom'
+            },
+            title: {
+                display: true,
+                text: 'Order Revenue',
+            },
+        },
+    };
+
+
+
+    return (
+        <Card style={{width:500,height:250}}>
+            <Bar options={options} data={revenueData} />
+        </Card>
     )
 }
 
-export default Dashboard
+export default Dashboard;
