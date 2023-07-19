@@ -27,10 +27,15 @@
     flex: 1;
     justify-content: flex-start;
     align-items: flex-start;
+    background-color: #f3f6f4;
 }
 
 .SideMenu{
+    height: 100%;
+}
 
+.SideMenuVertical{
+    height: 100%;
 }
 
 .PageContent{

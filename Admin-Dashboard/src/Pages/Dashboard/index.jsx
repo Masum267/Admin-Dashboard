@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react'
 import Typography from 'antd/es/typography/Typography'
 import { Card, Space, Statistic, Table } from 'antd'
 import { DollarCircleOutlined, ShoppingCartOutlined, ShoppingOutlined, UserOutlined } from '@ant-design/icons'
-import { getOrders, getRevenue } from '../../API/Index';
+import { getCustomers, getInventory, getOrders, getRevenue } from '../../API/Index';
 import {
     Chart as ChartJS,
     CategoryScale,
@@ -27,6 +27,25 @@ ChartJS.register(
 
 
 function Dashboard() {
+
+    const [orders, setOrders] = useState(0);
+    const [inventory, setInventory] = useState(0);
+    const [customers, setCustomers] = useState(0);
+    const [revenue, setRevenue] = useState(0);
+
+    useEffect(() => {
+        getInventory().then(res =>{
+            setInventory(res.total)
+        });
+        getOrders().then(res =>{
+            setOrders(res.total);
+            setRevenue(res.discountedTotal)
+        });
+        getCustomers().then(res =>{
+            setCustomers(res.total)
+        });
+    }, [])
+
     return (
         <Space size={20} direction='vertical'>
             <Typography.Title level={4}>
@@ -41,7 +60,7 @@ function Dashboard() {
                         fontSize: 24,
                         padding: 8,
                     }}
-                />} title={"Inventory"} value={12345} />
+                />} title={"Inventory"} value={inventory} />
 
                 <DashboardCard icon={<ShoppingCartOutlined
                     style={{
@@ -51,7 +70,7 @@ function Dashboard() {
                         fontSize: 24,
                         padding: 8,
                     }}
-                />} title={"Orders"} value={12345} />
+                />} title={"Orders"} value={orders} />
 
                 <DashboardCard icon={<UserOutlined
                     style={{
@@ -61,7 +80,7 @@ function Dashboard() {
                         fontSize: 24,
                         padding: 8,
                     }}
-                />} title={"Customers"} value={12345} />
+                />} title={"Customers"} value={customers} />
 
                 <DashboardCard icon={<DollarCircleOutlined
                     style={{
@@ -71,7 +90,7 @@ function Dashboard() {
                         fontSize: 24,
                         padding: 8,
                     }}
-                />} title={"Revenue"} value={12345} />
+                />} title={"Revenue"} value={revenue} />
             </Space>
             <Space>
                 <RecentOrders />
