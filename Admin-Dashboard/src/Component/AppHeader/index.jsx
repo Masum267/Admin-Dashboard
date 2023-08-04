@@ -40,7 +40,7 @@ function AppHeader() {
                 </Badge>
 
             </Space>
-            <Drawer title="Comments" open={commentsOpen} onClose={() => {
+            <Drawer title="Mail" open={commentsOpen} onClose={() => {
                 setCommentsOpen(false)
             }}
                 maskClosable
